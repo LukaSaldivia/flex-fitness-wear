@@ -192,8 +192,10 @@ h6 {
 			transparent 50%,
 			rgba(0, 0, 0, 0.8) 70%);
 	mask-size: 200% 200%;
+	mask-position: 150% 0;
 
-	animation: shine 1.5s cubic-bezier(0.22, 1, 0.36, 1.19) forwards;
+	animation: shine 1.5s ease-in forwards;
+	animation-delay: .7s;
 
 }
 
