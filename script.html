@@ -1,3 +1,147 @@
 <script>
-  
+
+  const titles = [
+    "Flex Fitness Wear | Tienda Oficial",
+    "Calidad premium para tu entrenamiento"
+  ];
+
+  let i = 0;
+  document.title = titles[i % titles.length];
+
+  let interval;
+
+  const start = () => {
+    if (!interval) {
+      interval = setInterval(() => {
+        document.title = titles[i % titles.length];
+        i++;
+      }, 1500);
+    }
+  };
+
+  const stop = () => {
+    clearInterval(interval);
+    interval = null;
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      document.title = "¡Todavía queda mucho para ver!"
+      return stop()
+    }
+
+    start()
+  });
+
+  start();
+
+  let lastMpage = null;
+
+  const observed = new WeakSet();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("show");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.3 // se activa cuando entra 30%
+  });
+
+
+  // Cursor
+  document.querySelector("header").insertAdjacentHTML("afterend", '<div id="cursor"><div class="cursor__circle"></div></div>')
+
+
+  const cursor = document.querySelector('#cursor');
+
+  const cursorCircle = cursor.querySelector('.cursor__circle');
+
+  const mouse = { x: -100, y: -100 };
+  const pos = { x: 0, y: 0 };
+  const speed = 0.1;
+
+  const updateCoordinates = e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    cursor.classList.toggle('cursor__overlay', e.target.nodeName === 'A' || e.target.closest('a'));
+  }
+
+  window.addEventListener('mousemove', updateCoordinates);
+
+
+  function getAngle(diffX, diffY) {
+    return Math.atan2(diffY, diffX) * 180 / Math.PI;
+  }
+
+  function getSqueeze(diffX, diffY) {
+    const distance = Math.sqrt(
+      Math.pow(diffX, 2) + Math.pow(diffY, 2)
+    );
+    const maxSqueeze = 0.15;
+    const accelerator = 1500;
+    return Math.min(distance / accelerator, maxSqueeze);
+  }
+
+
+  const updateCursor = () => {
+    const diffX = Math.round(mouse.x - pos.x);
+    const diffY = Math.round(mouse.y - pos.y);
+
+    pos.x += diffX * speed;
+    pos.y += diffY * speed;
+
+    const angle = getAngle(diffX, diffY);
+    const squeeze = getSqueeze(diffX, diffY);
+
+    const scale = 'scale(' + (1 + squeeze) + ', ' + (1 - squeeze) + ')';
+    const rotate = 'rotate(' + angle + 'deg)';
+    const translate = 'translate3d(' + pos.x + 'px ,' + pos.y + 'px, 0)';
+
+    cursor.style.transform = translate;
+    cursorCircle.style.transform = rotate + scale;
+  };
+
+  const getArticles = () => {
+    const articles = document.querySelectorAll(".item-product")
+    articles.forEach(el => {
+      if (!observed.has(el)) {
+        observer.observe(el);
+        observed.add(el);
+      }
+    });
+  }
+
+  function loop() {
+    updateCursor();
+    const current = new URLSearchParams(window.location.search).get('mpage');
+    if (current !== lastMpage || !current || current >= 2) {
+      getArticles()
+      lastMpage = current
+    }
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
+
+
+  window.addEventListener('load', function () {
+
+    const variantes = document.querySelectorAll('.js-product-variants-group[data-variation-id]');
+
+    variantes.forEach(variante => {
+      if (variante.innerText.includes('Marca')) {
+        variante.style.display = 'none';
+      }
+    });
+
+    const rowBanner= document.querySelector('.row:has(.textbanner)')
+
+    rowBanner.style.justifyContent = 'center';
+
+  });
+
+
 </script>
