@@ -15,7 +15,7 @@
       interval = setInterval(() => {
         document.title = titles[i % titles.length];
         i++;
-      }, 1500);
+      }, 4500);
     }
   };
 
@@ -138,8 +138,16 @@
     });
 
     const rowBanner= document.querySelector('.row:has(.textbanner)')
-
     rowBanner.style.justifyContent = 'center';
+
+    const bannerImage = document.querySelector('.textbanner-image-background')
+    bannerImage.src = "https://lukasaldivia.github.io/flex-fitness-wear/banner.png"
+    bannerImage.srcset = "https://lukasaldivia.github.io/flex-fitness-wear/banner.png"
+
+    // Deleting dataset attributes to prevent conflicts with the script
+
+    bannerImage.removeAttribute('data-src');
+    bannerImage.removeAttribute('data-srcset');
 
   });
 
